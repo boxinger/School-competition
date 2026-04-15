@@ -30,6 +30,7 @@
 #include "Encoder.h"
 #include "UISync.h"
 #include <stdio.h>
+#include "arm_math.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -97,7 +98,7 @@ static UISync_DeviceStatusTypedef UISyncTest_EncoderUpdate(void)
 
 static void UISyncTest_EncoderProcess(void)
 {
-  /* ������������ Update �׶β��������棬���ﱣ���մ��� */
+  
 }
 
 static void UISyncTest_OledInit(void)
@@ -128,14 +129,17 @@ static void UISyncTest_OledProcess(void)
 {
   char line1[21];
   char line2[21];
+  char line3[32];
 
   (void)snprintf(line1, sizeof(line1), "Step:%6d", (int)gEncoderLastStep);
   (void)snprintf(line2, sizeof(line2), "Total:%5ld", (long)gEncoderTotalCount);
+  (void)snprintf(line3, sizeof(line3), "PI:%10.10f", PI);
 
   OLED_GFX_Clear();
   OLED_ShowString(0, 0, "UISync Test");
   OLED_ShowString(0, 16, line1);
   OLED_ShowString(0, 32, line2);
+  OLED_ShowString(0, 47, line3);
   OLED_GFX_Refresh();
 
   gOledNeedRefresh = 0U;
