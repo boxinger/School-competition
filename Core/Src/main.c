@@ -27,6 +27,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "OLED_GFX.h"   
+#include "Encoder.h"
+#include "UISync.h"
 #include <stdio.h>
 /* USER CODE END Includes */
 
@@ -59,6 +61,120 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+static UISync_DeviceHandleTypedef *gEncoderDev = NULL;
+static UISync_DeviceHandleTypedef *gOledDev = NULL;
+
+static volatile int32_t gEncoderTotalCount = 0;
+static volatile int16_t gEncoderLastStep = 0;
+static volatile uint8_t gOledNeedRefresh = 0;
+
+static void UISyncTest_EncoderInit(void)
+{
+  Encoder_Init();
+}
+
+static void UISyncTest_EncoderDeInit(void)
+{
+  Encoder_DeInit();
+}
+
+static UISync_DeviceStatusTypedef UISyncTest_EncoderUpdate(void)
+{
+  int16_t step = Encoder_PopCount();
+  // int16_t step = Encoder_GetCCR();
+
+  if (step == 0)
+  {
+    return UISync_Waiting;
+  }
+
+  gEncoderLastStep = step;
+  gEncoderTotalCount += step;
+  gOledNeedRefresh = 1U;
+
+  return UISync_Pending;
+}
+
+static void UISyncTest_EncoderProcess(void)
+{
+  /* ������������ Update �׶β��������棬���ﱣ���մ��� */
+}
+
+static void UISyncTest_OledInit(void)
+{
+  OLED_GFX_Init();
+  OLED_GFX_Clear();
+  OLED_ShowString(0, 0, "UISync Test");
+  OLED_ShowString(0, 16, "Rotate encoder");
+  OLED_GFX_Refresh();
+}
+
+static void UISyncTest_OledDeInit(void)
+{
+  OLED_GFX_Stop();
+}
+
+static UISync_DeviceStatusTypedef UISyncTest_OledUpdate(void)
+{
+  if (gOledNeedRefresh != 0U)
+  {
+    return UISync_Pending;
+  }
+
+  return UISync_Waiting;
+}
+
+static void UISyncTest_OledProcess(void)
+{
+  char line1[21];
+  char line2[21];
+
+  (void)snprintf(line1, sizeof(line1), "Step:%6d", (int)gEncoderLastStep);
+  (void)snprintf(line2, sizeof(line2), "Total:%5ld", (long)gEncoderTotalCount);
+
+  OLED_GFX_Clear();
+  OLED_ShowString(0, 0, "UISync Test");
+  OLED_ShowString(0, 16, line1);
+  OLED_ShowString(0, 32, line2);
+  OLED_GFX_Refresh();
+
+  gOledNeedRefresh = 0U;
+}
+
+static void UISyncTest_Init(void)
+{
+  UISync_DeviceInitTypedef encoderInit = {
+      .Init = UISyncTest_EncoderInit,
+      .DeInit = UISyncTest_EncoderDeInit,
+      .Rank = 0U,
+      .DataSheet = NULL,
+      .Update = UISyncTest_EncoderUpdate,
+      .Process = UISyncTest_EncoderProcess,
+  };
+  UISync_DeviceInitTypedef oledInit = {
+      .Init = UISyncTest_OledInit,
+      .DeInit = UISyncTest_OledDeInit,
+      .Rank = 1U,
+      .DataSheet = NULL,
+      .Update = UISyncTest_OledUpdate,
+      .Process = UISyncTest_OledProcess,
+  };
+
+  gEncoderDev = UISync_RegisterDevice(&encoderInit);
+  gOledDev = UISync_RegisterDevice(&oledInit);
+
+  if ((gEncoderDev == NULL) || (gOledDev == NULL))
+  {
+    OLED_GFX_Init();
+    OLED_GFX_Clear();
+    OLED_ShowString(0, 0, "UISync Reg Err");
+    OLED_GFX_Refresh();
+    return;
+  }
+
+  gOledNeedRefresh = 1U;
+  HAL_TIM_Base_Start_IT(&htim4);
+}
 
 /* USER CODE END 0 */
 
@@ -99,16 +215,7 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-
-	OLED_GFX_Init();
-  // __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 420);
-  // HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-  // HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
-  // __HAL_TIM_MOE_ENABLE(&htim1);
- 
-	
-	OLED_ShowString(0, 0, "hello!");
-	OLED_GFX_Refresh();
+  UISyncTest_Init();
 
   /* USER CODE END 2 */
 
@@ -119,6 +226,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+    UISync_Process();
 	  
   }
   /* USER CODE END 3 */
@@ -170,6 +279,14 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  if (htim->Instance == TIM4)
+  {
+    UISync_Update();
+  }
+}
 
 
 
