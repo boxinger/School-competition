@@ -9,6 +9,7 @@ typedef struct {
     void (*Start)(void);
     void (*Stop)(void);
     void (*SetDuty)(float duty);
+    float (*GetInputVoltage)(void);
     float (*GetOutputVoltage)(void);
     float (*GetInductorCurrent)(void);
     PID_InitTypeDef* OutPutVoltagePIDInit;

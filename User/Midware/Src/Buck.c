@@ -58,6 +58,7 @@ Buck_HandleTypeDef*  Buck_Init(Buck_InitTypeDef* init) {
     return handle;
 }
 
+
 void Buck_DeInit(Buck_HandleTypeDef* handle) {
     // Verify input parameter
     if (handle == NULL) {
@@ -78,6 +79,7 @@ void Buck_DeInit(Buck_HandleTypeDef* handle) {
     free(handle);
 }
 
+
 void Buck_Start(Buck_HandleTypeDef* handle) {
     if (handle == NULL) {
         return;
@@ -93,6 +95,7 @@ void Buck_Start(Buck_HandleTypeDef* handle) {
     handle->State = BUCK_CVMODE; // Default to CV mode when starting
 }
 
+
 void Buck_Stop(Buck_HandleTypeDef* handle) {
     if (handle == NULL) {
         return;
@@ -100,6 +103,7 @@ void Buck_Stop(Buck_HandleTypeDef* handle) {
     handle->Init.Stop();
     handle->State = BUCK_DISABLED;
 }
+
 
 Buck_StateTypeDef Buck_GetState(Buck_HandleTypeDef* handle) {
     if (handle == NULL) {
@@ -114,6 +118,7 @@ Buck_FaultFlagTypeDef Buck_GetFaultFlag(Buck_HandleTypeDef* handle) {
     }
     return handle->FaultFlag;
 }
+
 
 void Buck_ClearFaultFlag(Buck_HandleTypeDef* handle) {
     if (handle == NULL) {
@@ -132,12 +137,14 @@ void Buck_SetValue(Buck_HandleTypeDef* handle, float Voltage, float Current) {
     handle->MaxInductorCurrent = Current;
 }
 
+
 float Buck_GetDuty(Buck_HandleTypeDef* handle) {
     if (handle == NULL) {
         return 0.0f;
     }
     return handle->Duty;
 }
+
 
 void Buck_Sync(Buck_HandleTypeDef* handle) {
     // Verify input parameter
