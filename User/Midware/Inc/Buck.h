@@ -24,10 +24,11 @@ typedef enum{
 }Buck_StateTypeDef;
 
 typedef enum{
-    BUCK_NOERROR = 0U,
-    BUCK_OCP = 1U << 0,
-    BUCK_OVP = 1U << 1
-}Buck_FaultFlagTypeDef;
+    BUCK_INVALID = 0U,
+    BUCK_NOERROR,
+    BUCK_OCP,
+    BUCK_OVP
+}Buck_FaultCodeTypeDef;
 
 typedef struct Buck_HandleTypeDef Buck_HandleTypeDef;
 
@@ -43,8 +44,8 @@ void Buck_DeInit(Buck_HandleTypeDef* handle);
 void Buck_Start(Buck_HandleTypeDef* handle);
 void Buck_Stop(Buck_HandleTypeDef* handle);
 Buck_StateTypeDef Buck_GetState(Buck_HandleTypeDef* handle);
-Buck_FaultFlagTypeDef Buck_GetFaultFlag(Buck_HandleTypeDef* handle);
-void Buck_ClearFaultFlag(Buck_HandleTypeDef* handle);
+Buck_FaultCodeTypeDef Buck_GetFaultCode(Buck_HandleTypeDef* handle);
+void Buck_ClearFaultCode(Buck_HandleTypeDef* handle);
 
 void Buck_SetValue(Buck_HandleTypeDef* handle, float Voltage, float Current);
 float Buck_GetDuty(Buck_HandleTypeDef* handle);
