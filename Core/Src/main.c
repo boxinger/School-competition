@@ -31,6 +31,7 @@
 #include "UISync.h"
 #include <stdio.h>
 #include "arm_math.h"
+#include "PWM.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -220,6 +221,10 @@ int main(void)
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
   UISyncTest_Init();
+  PWM_Init();
+  PWM_SetDuty(PWM_BuckChannel, 0.5f);
+  PWM_Start(PWM_BuckChannel);
+  
 
   /* USER CODE END 2 */
 
