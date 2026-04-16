@@ -169,13 +169,13 @@ void Buck_Sync(Buck_HandleTypeDef* handle) {
     float presentCurrent = handle->Init.GetInductorCurrent();
 
     //Protection
-    if ( presentCurrent > BUCK_OCTHRESHOLD + handle->MaxInductorCurrent){
+    if ( presentCurrent > BUCK_OCTHRESHOLD){
         Buck_Stop(handle);
         handle->State = BUCK_ERROR;
         handle->FaultCode = BUCK_OCP;
         return;
     }
-    if  (presentVoltage > BUCK_OVTHRESHOLD + handle->TargetOutputVoltage){
+    if  (presentVoltage > BUCK_OVTHRESHOLD){
         Buck_Stop(handle);
         handle->State = BUCK_ERROR;
         handle->FaultCode = BUCK_OVP;
