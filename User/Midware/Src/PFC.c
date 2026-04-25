@@ -196,9 +196,9 @@ void PFC_Sync(PFC_HandleTypeDef* handle) {
     handle->CurrentLoopCounter++;
 
     if (handle->Polarity == PFC_ZeroCrossing) {
-        handle ->Stop();
+        handle ->Init.Stop();
     } else {
-        handle ->Start();
+        handle ->Init.Start();
     }
 
     if (handle ->VoltageLoopCounter >= PFC_VoltageLoopMaxCounter) { 
